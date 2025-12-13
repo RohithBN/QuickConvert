@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# Temp directories
+temp/
+input/
+backend/go/img-x-converter/temp/
+backend/go/img-x-converter/input/
+
+# Generated files
+*.pdf
+*.jpg
+*.png
+*.jpeg
+
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+/bin/
+
+# Dependencies
+vendor/
+
+# IDE
+.vscode/
+.idea/
