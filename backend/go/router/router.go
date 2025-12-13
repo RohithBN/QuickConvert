@@ -2,6 +2,7 @@ package router
 
 import (
 	imagepdf "github.com/RohithBn/img-x-converter"
+	"github.com/RohithBn/lib"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -23,12 +24,8 @@ func SetupRoutes(app *App) *gin.Engine {
 		AllowCredentials: true,
 	}))
 
-	r.POST("/convert/image-pdf", func(c *gin.Context) {
-		if err := app.ImgHandler.ConvertToPDFHandler(c); err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-		}
-	})
-
+	r.POST("/convert/image-pdf", lib.GinErrorWrapper(app.ImgHandler.ConvertToPDFHandler))
+	r.POST("/convert/png-jpeg",lib.GinErrorWrapper(app.ImgHandler.ConvertPNGToJPEGHandler))
 	return r
 
 }
