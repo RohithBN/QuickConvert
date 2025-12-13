@@ -44,5 +44,26 @@ func (h *Handler) ConvertToPDFHandler(c *gin.Context) error {
 	c.Header("Content-Disposition", "attachment; filename=converted.pdf")
 	c.File("./temp/" + outputPdfPath)
 	return nil
+}
+
+
+func (h *Handler) ConvertPNGToJPEGHandler( c *gin.Context) error {
+	form , _ := c.MultipartForm()
+	file := form.File["file"]
+
+	imgPath := "./input/" + file[0].Filename
+	if err := c.SaveUploadedFile(file[0], imgPath); err != nil {
+		return fmt.Errorf("failed to save file %s: %w", file[0].Filename, err)
+	}
+
+	jpegPath, err := h.Service.ConvertPNGToJPEG(imgPath)
+	if err != nil {
+		return err
+	}
+
+	c.Header("Content-Type", "image/jpeg")
+	c.Header("Content-Disposition", "attachment; filename=converted.jpg")
+	c.File(jpegPath)
+	return nil
 
 }
