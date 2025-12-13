@@ -26,6 +26,7 @@ func SetupRoutes(app *App) *gin.Engine {
 
 	r.POST("/convert/image-pdf", lib.GinErrorWrapper(app.ImgHandler.ConvertToPDFHandler))
 	r.POST("/convert/png-jpeg",lib.GinErrorWrapper(app.ImgHandler.ConvertPNGToJPEGHandler))
+	r.POST("/convert/jpeg-png",lib.GinErrorWrapper(app.ImgHandler.ConvertJPEGToPNGHandler))
 	return r
 
 }

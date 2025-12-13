@@ -65,5 +65,30 @@ func (h *Handler) ConvertPNGToJPEGHandler( c *gin.Context) error {
 	c.Header("Content-Disposition", "attachment; filename=converted.jpg")
 	c.File(jpegPath)
 	return nil
+}
 
+
+func (h *Handler) ConvertJPEGToPNGHandler( c *gin.Context) error {
+	form,_:=c.MultipartForm()
+	file:=form.File["file"]
+
+	if err:= os.MkdirAll("./input",0755);err!=nil{
+		return fmt.Errorf("failed to create input directory: %w", err)
+	}
+
+	imgPath:= "./input/"+file[0].Filename
+
+	if err:= c.SaveUploadedFile(file[0],imgPath); err!= nil {
+		return fmt.Errorf("failed to save file %s: %w", file[0].Filename, err)
+	}
+
+	pngPath,err:= h.Service.ConvertJPEGToPNG(imgPath)
+	if err!= nil {
+		return err
+	}
+
+	c.Header("Content-Type","application/image")
+	c.Header("Content-Disposition", "attachment; filename=converted.png")
+	c.File(pngPath)
+	return nil
 }

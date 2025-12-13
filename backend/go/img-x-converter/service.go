@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"image/jpeg"
+	"image/png"
 	"net/http"
 	"os"
 	"time"
@@ -18,6 +19,7 @@ type Service struct {
 	HTTPClient  *http.Client
 	PDFConfig   PDFConfig
 	TempJpegDir string
+	TempPNGDir string
 }
 
 type PDFConfig struct {
@@ -42,6 +44,7 @@ func NewService() *Service {
 			ImageMargin: 10,
 			ImageWidth:  190,
 		},
+		TempPNGDir: "./png-images",
 	}
 }
 
@@ -148,6 +151,51 @@ func (s *Service) ConvertPNGToJPEG(imageUrl string) (string, error) {
 	}
 
 	return jpegImagePath, nil
+}
+
+
+func (s *Service) ConvertJPEGToPNG(imageUrl string) (string,error){
+	// check if file path exists
+	fmt.Println("Called j->png")
+	if len(imageUrl) ==0 {
+		return "", fmt.Errorf("no image provided")
+	}
+
+	// create a output dir if not exists
+	if err:=os.MkdirAll(s.TempPNGDir,0755);err!=nil{
+		return "", fmt.Errorf("failed to create png directory: %w", err)
+	}
+
+	//download the jpeg image from path
+	img , err:= os.Open(imageUrl)
+	if err!= nil {
+		return "", fmt.Errorf("failed to open image %s: %w", imageUrl, err)
+	}
+	defer img.Close()
+
+	// decode the jpeg image
+	jpegImg,err:= jpeg.Decode(img)
+	if err!= nil {
+		return "", fmt.Errorf("failed to decode jpeg image %s: %w", imageUrl, err)
+	}
+
+	// generate unique key for png image
+	uniqueKey:= generateUniqueKey()
+	pngImagePath:= s.TempPNGDir + "/" + uniqueKey + ".png"
+
+	// create the png file
+	pngFile,err:= os.Create(pngImagePath)
+	if err!= nil {
+		return "", fmt.Errorf("failed to create png file %s: %w", pngImagePath, err)
+	}
+	defer pngFile.Close()
+
+	// encode the png image
+	err = png.Encode(pngFile,jpegImg)
+	if err!= nil {
+		return "", fmt.Errorf("failed to encode png image %s: %w", pngImagePath, err)
+	}
+	return pngImagePath, nil
 }
 
 func generateUniqueKey() string {
