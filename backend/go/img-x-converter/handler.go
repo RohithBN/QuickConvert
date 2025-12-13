@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/RohithBn/lib"
 	"github.com/gin-gonic/gin"
 )
 
@@ -91,4 +92,44 @@ func (h *Handler) ConvertJPEGToPNGHandler( c *gin.Context) error {
 	c.Header("Content-Disposition", "attachment; filename=converted.png")
 	c.File(pngPath)
 	return nil
+}
+
+func (h *Handler) ResizeImageHandler(c *gin.Context) error {
+	form ,_:= c.MultipartForm()
+	file:= form.File["file"]
+	width:= form.Value["width"]
+	height:= form.Value["height"]
+	
+	if len(width) ==0 || len(height) ==0 {
+		return fmt.Errorf("width and height must be provided")
+	}
+
+	// create input directory if not exists
+	if err:= os.MkdirAll("./input",0755);err!=nil{
+		return fmt.Errorf("failed to create input directory: %w", err)
+	}
+
+	imgPath:= "./input/" + file[0].Filename
+	if err:= c.SaveUploadedFile(file[0], imgPath); err!= nil {
+		return fmt.Errorf("failed to save file %s: %w", file[0].Filename, err)
+	}
+	widthInt, err:= lib.ParseStringToInt(width[0])
+	if err!= nil {
+		return fmt.Errorf("invalid width value %s: %w", width[0], err)
+	}
+	heightInt, err:= lib.ParseStringToInt(height[0])
+	if err!= nil {
+		return fmt.Errorf("invalid height value %s: %w", height[0], err)
+	}
+	
+	resizedImagePath, err:= h.Service.ResizeImage(imgPath,uint(widthInt),uint(heightInt))
+	if err!= nil {
+		return err
+	}
+	
+	c.Header("Content-Type","application/image")
+	c.Header("Content-Disposition", "attachment; filename=resized_"+ file[0].Filename)
+	c.File(resizedImagePath)
+	return nil
+
 }

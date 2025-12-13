@@ -20,6 +20,7 @@ type Service struct {
 	PDFConfig   PDFConfig
 	TempJpegDir string
 	TempPNGDir string
+	TempResizeDir string
 }
 
 type PDFConfig struct {
@@ -45,6 +46,7 @@ func NewService() *Service {
 			ImageWidth:  190,
 		},
 		TempPNGDir: "./png-images",
+		TempResizeDir: "./resized-images",
 	}
 }
 
@@ -196,6 +198,69 @@ func (s *Service) ConvertJPEGToPNG(imageUrl string) (string,error){
 		return "", fmt.Errorf("failed to encode png image %s: %w", pngImagePath, err)
 	}
 	return pngImagePath, nil
+}
+
+func (s *Service) ResizeImage(imageUrl string , width uint , height uint) (string,error){
+	// check if file path exists
+	if len(imageUrl) ==0 {
+		return "", fmt.Errorf("no image provided")
+	}
+
+	// create a output dir if not exists
+	if err:=os.MkdirAll(s.TempResizeDir,0755);err!=nil{
+		return "", fmt.Errorf("failed to create resized images directory: %w", err)
+	}
+
+	// open the image from path
+	img,err:=os.Open(imageUrl)
+	if err!= nil {
+		return "", fmt.Errorf("failed to open image %s: %w", imageUrl, err)
+	}
+	defer img.Close()
+
+	// decode the image
+	decodedImg,_,err:= image.Decode(img)
+	if err!= nil {
+		return "", fmt.Errorf("failed to decode image %s: %w", imageUrl, err)
+	}
+
+	// resize the image using nearest neighbor algorithm
+	scalingFactorX:=float64(width)/float64(decodedImg.Bounds().Dx())
+	scalingFactorY:=float64(height)/float64(decodedImg.Bounds().Dy())
+
+	rectangle := &image.Rectangle{
+		Min: image.Point{X: 0, Y: 0},
+		Max: image.Point{X: int(width), Y: int(height)},
+	}
+
+	resizedImg:= image.NewRGBA(*rectangle)
+
+	for y:=0; y<int(height); y++{
+		for x:=0; x<int(width); x++{
+			srcX:= int(float64(x)/scalingFactorX)
+			srcY:= int(float64(y)/scalingFactorY)
+			resizedImg.Set(x,y,decodedImg.At(srcX,srcY))
+			
+		}
+	}
+
+	// generate unique key for resized image
+	uniqueKey:= generateUniqueKey()
+	resizedImagePath:= s.TempResizeDir + "/" + uniqueKey + ".png"
+
+	// create the resized image file
+	resizedFile,err:= os.Create(resizedImagePath)
+	if err!= nil {
+		return "", fmt.Errorf("failed to create resized image file %s: %w", resizedImagePath, err)
+	}
+	defer resizedFile.Close()
+	
+	// encode the resized image as png
+	err = png.Encode(resizedFile,resizedImg)
+	if err!= nil {
+		return "", fmt.Errorf("failed to encode resized image %s: %w", resizedImagePath, err)
+	}
+	return resizedImagePath, nil
 }
 
 func generateUniqueKey() string {
