@@ -33,6 +33,9 @@ vendor/
 *.pyc
 *.python-version
 
+# Temp working directory
+backend/pyservice/temp_processing/
+
 # Test / coverage
 **/.mypy_cache/
 **/.pytest_cache/
