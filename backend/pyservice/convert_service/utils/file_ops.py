@@ -23,7 +23,7 @@ def zip_output_folders(output_folders: List[Path], work_dir: Path) -> Path:
     Zips all folders in output_folders into a single zip file in work_dir and 
     returns the path to the zip file
     """
-    zip_path = work_dir/"converted_images.zip"
+    zip_path = work_dir/"converted.zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
         for folder in output_folders:
             for file in folder.iterdir():
@@ -45,4 +45,4 @@ def cleanup_files(paths: List[Union[str, Path]]):
             elif p.is_dir():
                 shutil.rmtree(p)
         except Exception as e:
-            print(e)
+            print(f"Cleaup failed for {p}: {e}")

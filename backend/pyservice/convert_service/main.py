@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from convert_service.health.api import router as health_router
 from convert_service.pdf2jpg.api import router as pdf2jpg_router
+from convert_service.docx2pdf.api import router as docx2pdf_router
 
 app = FastAPI()
 
@@ -17,3 +18,4 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(pdf2jpg_router)
+app.include_router(docx2pdf_router)
