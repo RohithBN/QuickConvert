@@ -25,6 +25,23 @@ backend/go/img-x-converter/input/
 # Dependencies
 vendor/
 
+# Python virtual envs
+**/.venv/
+
+# Python bytecode
+**/__pycache__/
+*.pyc
+*.python-version
+
+# Temp working directory
+backend/pyservice/temp_processing/
+
+# Test / coverage
+**/.mypy_cache/
+**/.pytest_cache/
+.coverage
+htmlcov/
+
 # IDE
 .vscode/
 .idea/
