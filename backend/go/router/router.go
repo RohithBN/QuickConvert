@@ -3,12 +3,14 @@ package router
 import (
 	imagepdf "github.com/RohithBn/img-x-converter"
 	"github.com/RohithBn/lib"
+	pdfops "github.com/RohithBn/pdfOps"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 type App struct {
 	ImgHandler *imagepdf.Handler
+	PDFHandler *pdfops.Handler
 }
 
 func SetupRoutes(app *App) *gin.Engine {
@@ -25,9 +27,11 @@ func SetupRoutes(app *App) *gin.Engine {
 	}))
 
 	r.POST("/convert/image-pdf", lib.GinErrorWrapper(app.ImgHandler.ConvertToPDFHandler))
-	r.POST("/convert/png-jpeg",lib.GinErrorWrapper(app.ImgHandler.ConvertPNGToJPEGHandler))
-	r.POST("/convert/jpeg-png",lib.GinErrorWrapper(app.ImgHandler.ConvertJPEGToPNGHandler))
-	r.POST("/resize",lib.GinErrorWrapper(app.ImgHandler.ResizeImageHandler))
+	r.POST("/convert/png-jpeg", lib.GinErrorWrapper(app.ImgHandler.ConvertPNGToJPEGHandler))
+	r.POST("/convert/jpeg-png", lib.GinErrorWrapper(app.ImgHandler.ConvertJPEGToPNGHandler))
+	r.POST("/resize", lib.GinErrorWrapper(app.ImgHandler.ResizeImageHandler))
+
+	r.POST("/merge", lib.GinErrorWrapper(app.PDFHandler.MergePDFsHandler))
 	return r
 
 }

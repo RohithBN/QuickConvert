@@ -17,8 +17,13 @@ func NewHandler(service *Service) *Handler {
 }
 
 func (h *Handler) ConvertToPDFHandler(c *gin.Context) error {
+
+	fmt.Println("Received request")
 	form, _ := c.MultipartForm()
-	files := form.File["files"]
+	files,ok := form.File["files"]
+	if !ok || len(files) == 0 {
+		return fmt.Errorf("No files provided")
+	}
 	var imageUrls []string
 
 	// create a temporary directory to store uploaded images
@@ -50,7 +55,10 @@ func (h *Handler) ConvertToPDFHandler(c *gin.Context) error {
 
 func (h *Handler) ConvertPNGToJPEGHandler( c *gin.Context) error {
 	form , _ := c.MultipartForm()
-	file := form.File["file"]
+	file,ok := form.File["file"]
+	if !ok || len(file) == 0 {
+		return fmt.Errorf("No files provided")
+	}
 
 	imgPath := "./input/" + file[0].Filename
 	if err := c.SaveUploadedFile(file[0], imgPath); err != nil {
@@ -71,7 +79,10 @@ func (h *Handler) ConvertPNGToJPEGHandler( c *gin.Context) error {
 
 func (h *Handler) ConvertJPEGToPNGHandler( c *gin.Context) error {
 	form,_:=c.MultipartForm()
-	file:=form.File["file"]
+	file,ok := form.File["file"]
+	if !ok || len(file) == 0 {
+		return fmt.Errorf("No files provided")
+	}
 
 	if err:= os.MkdirAll("./input",0755);err!=nil{
 		return fmt.Errorf("failed to create input directory: %w", err)
@@ -96,9 +107,18 @@ func (h *Handler) ConvertJPEGToPNGHandler( c *gin.Context) error {
 
 func (h *Handler) ResizeImageHandler(c *gin.Context) error {
 	form ,_:= c.MultipartForm()
-	file:= form.File["file"]
-	width:= form.Value["width"]
-	height:= form.Value["height"]
+	file,ok := form.File["file"]
+	if !ok || len(file) == 0 {
+		return fmt.Errorf("No files provided")
+	}
+	width , ok:= form.Value["width"]
+	if !ok {
+		return fmt.Errorf("width and height must be provided")
+	}
+	 height , ok:= form.Value["height"]
+	 if !ok {
+		return fmt.Errorf("width and height must be provided")
+	 }
 	
 	if len(width) ==0 || len(height) ==0 {
 		return fmt.Errorf("width and height must be provided")
