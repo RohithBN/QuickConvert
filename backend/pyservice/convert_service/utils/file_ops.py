@@ -45,4 +45,4 @@ def cleanup_files(paths: List[Union[str, Path]]):
             elif p.is_dir():
                 shutil.rmtree(p)
         except Exception as e:
-            print(f"Cleaup failed for {p}: {e}")
+            print(f"Cleanup failed for {p}: {e}")

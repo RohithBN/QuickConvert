@@ -17,7 +17,7 @@ MAX_FILE_SIZE_MB = 20
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 @router.post("/", summary="PDFs to JPGs conversion")
-async def convert_pdf_to_jpg(files: List[UploadFile] = File(...), background_tasks: BackgroundTasks = None):
+def convert_pdf_to_jpg(files: List[UploadFile] = File(...), background_tasks: BackgroundTasks = None):
     validate_uploads(
         files,
         max_no = MAX_FILES,

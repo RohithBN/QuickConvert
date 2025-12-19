@@ -30,7 +30,6 @@ def convert_docx_to_pdf(files: List[UploadFile] = File(...), background_tasks: B
     )
     
     # Use directory `temp_processing` and call the service function
-    # work_dir = Path(__file__).parent.parent.parent/"temp_processing"
     work_dir = Path(__file__).parent.parent/"temp_processing"
     work_dir.mkdir(exist_ok=True)
     try:
